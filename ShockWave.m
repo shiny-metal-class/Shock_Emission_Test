@@ -29,29 +29,35 @@ classdef ShockWave
     end
     methods
         function E = Stream(obj,x,t)
-            if x < t*obj.Us 
-                E = obj.E_0*exp((log(2)/obj.LT).*(x-obj.Us.*t));
-            else
-                E = 0;
+            if t*obj.Us <= obj.L
+                E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
+                if x> obj.Us*t
+                    E = 0;
+                end
+            elseif t*obj.Us > obj.L
+                %E0 = obj.E_0*exp((obj.L/obj.Us-t));
+                E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
+                if x > obj.L
+                    E = 0;
+                end
             end
         end
+        
         function A = ABS(obj,x,t)
-            A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x));
-            if x < obj.Us*t
-                A = A*exp(-obj.Beta);
+            if obj.Us*t < obj.L
+                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x))*exp(-obj.Beta);
+            else
+                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x));
             end
         end
-        function E_total = Integrate(obj,t)
-            %{
-            E = @(x) obj.ABS(x,t);
-            E_total = integral(E,0,255);
-            %}
-            E = linspace(0,1000);
-            En(1) = 0;
-            for i = 2:length(E)
-                En(i) = En(i-1) + obj.ABS(i,t);
+        
+        function f = Int_En(obj,t)
+            E = [];
+            x = linspace(0,obj.L,10000);
+            for i = 1:length(x)
+                E(i) = obj.ABS(x(i),t);
             end
-            E_total = En(end);
+            f = trapz(x,E);
         end
     end
 end
