@@ -1,0 +1,58 @@
+%%
+%{
+Simulation of emitted light going through an explosive charge being
+shocked. By assumption we'll say:
+
+1. light produced by shock wave comes out instantaneously and follows first
+order reaction w/ parameterized rate determined by emission lifetime.
+
+2. Total radiance is simply the result of emission and absorption,
+scattering processes will be considered at a later time, but for now, all
+that's important is visible light transmittance. For all intents and
+purposes, the 'absorption' can be treated as an amalgom of absorption and
+scattering.
+
+3. Shock wave infinitely thin and has absorption coefficient Beta. This
+will be addressed in later systems.
+
+%}
+
+%%
+classdef ShockWave
+    properties
+        Us %Shock Velocity
+        L %Cell length
+        E_0 %Initial streaming radiance
+        LT %Radiation lifetime, proportionate to reaction rate
+        Alpha % Abs (and scattering) coefficient, material dependent
+        Beta %Shock wave light attenuation coeff.
+    end
+    methods
+        function E = Stream(obj,x,t)
+            if t*obj.Us <= obj.L
+                E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
+                if x> obj.Us*t
+                    E = 0;
+                end
+            elseif t*obj.Us > obj.L
+                %E0 = obj.E_0*exp((obj.L/obj.Us-t));
+                E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
+                if x > obj.L
+                    E = 0;
+                end
+            end
+        end
+        
+        function A = ABS(obj,x,t)
+            if obj.Us*t > obj.L
+                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x))*exp(-obj.Beta);
+            else
+                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x));
+            end
+        end
+        
+        function f = Int_En(obj,t)
+            x = linspace(0,obj.L,10000);
+            E = obj.A(
+    end
+end

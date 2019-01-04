@@ -1,0 +1,21 @@
+X = ShockWave; X.LT = 5; X.L = 40; X.Us = 7.25; X.E_0 = 200; 
+x = 1:0.5:255; X.Alpha = 0.2; X.Beta = 0;
+t = linspace(0,50);
+for j = 1:length(t)
+    for i = 1:length(x)
+        E(i,j) = X.Stream(x(i),t(j));
+    end
+    figure(1); hold off; 
+    plot(x,E(:,j));ylim([0,200]);
+        pause(0.1);
+    if max(E(:,j))<1E-12 & ~iszero(
+        break
+    end
+
+end
+
+for i = 1:length(t)
+    I(i) = X.Integrate(t(i));
+end
+figure(2); hold off;
+plot(t,I);
