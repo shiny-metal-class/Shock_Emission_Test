@@ -24,7 +24,7 @@ classdef ShockWave
         L %Cell length
         E_0 %Initial streaming radiance
         LT %Radiation lifetime, proportionate to reaction rate
-        Alpha % Abs (and scattering) coefficient, material dependent
+        Qs %scattering efficiency
         Beta %Shock wave light attenuation coeff.
     end
     methods
@@ -45,9 +45,9 @@ classdef ShockWave
         
         function A = ABS(obj,x,t)
             if obj.Us*t < obj.L
-                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x))*exp(-obj.Beta);
+                A = obj.Stream(x,t).*exp(-(obj.L-x)/(4.816/obj.Qs))*exp(-obj.Beta);
             else
-                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x));
+                A = obj.Stream(x,t).*exp(-(obj.L-x)./(4.816/obj.Qs));
             end
         end
         

@@ -1,6 +1,6 @@
 clear all;
-X = ShockWave; X.LT = 0.5; X.L = 165; X.Us = 7.25; X.E_0 = 7000; 
-x = linspace(0,X.L+10,10000); X.Alpha = 0.01; X.Beta = 0;
+X = ShockWave; X.LT = 5; X.L = 165; X.Us = 7.25; X.E_0 = 7000; X.Qs = 0.7;
+x = linspace(0,X.L+10,10000); X.Beta = 0;
 t = linspace(0,30);
 for j = 1:length(t)
     parfor i = 1:length(x)
