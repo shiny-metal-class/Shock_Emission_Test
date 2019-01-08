@@ -26,18 +26,19 @@ classdef ShockWave
         LT %Radiation lifetime, proportionate to reaction rate
         Qs %scattering efficiency
         Beta %Shock wave light attenuation coeff.
+        RZ %Rxn zone, ns
     end
     methods
         function E = Stream(obj,x,t)
-            if t*obj.Us <= obj.L
+            if (t)*obj.Us-obj.RZ*obj.Us <= obj.L
                 E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
-                if x> obj.Us*t
+                if (x)> obj.Us*t-(obj.RZ*obj.Us)
                     E = 0;
                 end
-            elseif t*obj.Us > obj.L
+            elseif (t)*obj.Us-obj.RZ*obj.Us > obj.L
                 %E0 = obj.E_0*exp((obj.L/obj.Us-t));
                 E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
-                if x > obj.L
+                if (x) > obj.L
                     E = 0;
                 end
             end
@@ -45,9 +46,10 @@ classdef ShockWave
         
         function A = ABS(obj,x,t)
             if obj.Us*t < obj.L
-                A = obj.Stream(x,t).*exp(-(obj.L-x)/(4.816/obj.Qs))*exp(-obj.Beta);
+                %A = obj.Stream(x,t).*exp(-(obj.L-x)/(4.816/obj.Qs))*exp(-obj.Beta);
+                 A = obj.Stream(x,t)*exp(-obj.Beta)*exp(-(obj.L-x)*obj.Qs);
             else
-                A = obj.Stream(x,t).*exp(-(obj.L-x)./(4.816/obj.Qs));
+                A = obj.Stream(x,t)*exp(-(obj.L-x)*obj.Qs); %.*exp(-(obj.L-x)./(4.816/obj.Qs));
             end
         end
         

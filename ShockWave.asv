@@ -24,17 +24,18 @@ classdef ShockWave
         L %Cell length
         E_0 %Initial streaming radiance
         LT %Radiation lifetime, proportionate to reaction rate
-        Alpha % Abs (and scattering) coefficient, material dependent
+        Qs %scattering efficiency
         Beta %Shock wave light attenuation coeff.
+        RZ %Rxn zone, ns
     end
     methods
         function E = Stream(obj,x,t)
-            if t*obj.Us <= obj.L
+            if t*obj.Us-obj.RZ <= obj.L
                 E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
-                if x> obj.Us*t
+                if x> obj.Us*t-obj.RZ
                     E = 0;
                 end
-            elseif t*obj.Us > obj.L
+            elseif (t-obj.RZ)*obj.Us > obj.L
                 %E0 = obj.E_0*exp((obj.L/obj.Us-t));
                 E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
                 if x > obj.L
@@ -44,15 +45,21 @@ classdef ShockWave
         end
         
         function A = ABS(obj,x,t)
-            if obj.Us*t > obj.L
-                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x))*exp(-obj.Beta);
+            if obj.Us*t < obj.L
+                %A = obj.Stream(x,t).*exp(-(obj.L-x)/(4.816/obj.Qs))*exp(-obj.Beta);
+                 A = obj.Stream(x,t)*exp(-obj.Beta);
             else
-                A = obj.Stream(x,t).*exp(-obj.Alpha*(obj.L-x));
+                A = obj.Stream(x,t); %.*exp(-(obj.L-x)./(4.816/obj.Qs));
             end
         end
         
         function f = Int_En(obj,t)
+            E = [];
             x = linspace(0,obj.L,10000);
-            E = obj.A(
+            for i = 1:length(x)
+                E(i) = obj.ABS(x(i),t);
+            end
+            f = trapz(x,E);
+        end
     end
 end
