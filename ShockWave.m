@@ -32,7 +32,10 @@ classdef ShockWave
         function E = Stream(obj,x,t)
             if (t)*obj.Us-obj.RZ*obj.Us <= obj.L
                 E = obj.E_0*exp(-(log(2)/obj.LT)*(t-x/obj.Us));
-                if (x)> obj.Us*t-(obj.RZ*obj.Us)
+                if (x)> obj.Us*t-(obj.RZ*obj.Us)& x< obj.L
+                     E=0 %E = obj.E_0*(x-obj.Us*t+obj.RZ)^2;
+                end
+                if x > obj.L
                     E = 0;
                 end
             elseif (t)*obj.Us-obj.RZ*obj.Us > obj.L
