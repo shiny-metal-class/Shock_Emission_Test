@@ -1,0 +1,4 @@
+X = ShockWave2(7,165,2000,.2);
+t = linspace(0,25);
+[x,I] = X.simulate(165,2);
+plot(x,I);
